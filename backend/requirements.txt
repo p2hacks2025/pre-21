@@ -5,3 +5,5 @@ uvicorn[all]
 python-multipart
 pypdf
 dotenv
+pylint
+pytest
