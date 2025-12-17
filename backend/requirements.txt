@@ -8,3 +8,5 @@ dotenv
 pylint
 pytest
 weasyprint
+jinja2
+pydantic
