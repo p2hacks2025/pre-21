@@ -7,3 +7,4 @@ pypdf
 dotenv
 pylint
 pytest
+weasyprint

@@ -17,4 +17,3 @@ async def health():
 @router.post("/generate", status_code=201)
 async def generate_text():
     pass
-
