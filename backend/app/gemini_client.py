@@ -1,13 +1,9 @@
 from fastapi import HTTPException
 from google import genai
 from google.genai import types
-import os
-import dotenv
+from .config import settings
 
-#.envを読み込む
-load_dotenv()
 
-API_KEY = os.getenv("GOOGLE_API_KEY")
 
 if not API_KEY:
     raise RuntimeError("環境変数 GOOGLE_API_KEY が設定されていません。")
