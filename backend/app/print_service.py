@@ -4,7 +4,6 @@ from .config import settings
 
 class PrintError(Exception):
     """Raised when printing fails."""
-    pass
 
 def print_pdf(pdf_path: str, copies: int = 1) -> None:
     """
@@ -20,5 +19,5 @@ def print_pdf(pdf_path: str, copies: int = 1) -> None:
         raise PrintError(f"Print failed: {e.stderr}") from e
 
 
-if name == "main":
+if __name__ == "__main__":
     print_pdf("data/artifacts/1.pdf", 1)

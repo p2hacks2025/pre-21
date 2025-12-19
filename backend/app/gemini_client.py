@@ -1,13 +1,9 @@
-from typing import Any
+from google import genai  # google-genai パッケージを前提とする
 from .config import settings
 from .models import PrintDoc
-from google import genai  # google-genai パッケージを前提とする
 
 class LLMError(Exception):
     """Raised for Gemini/LLM related failures."""
-    pass
-
-MODEL_NAME = settings.gemini_model
 
 def _get_client():
     api_key = settings.gemini_api_key

@@ -1,8 +1,8 @@
-from pydantic import BaseModel
 import os
+from pydantic import BaseModel
 from dotenv import load_dotenv
 
-.env を自動読み込み（ローカル開発向け）,
+# .env を自動読み込み（ローカル開発向け）
 load_dotenv()
 
 class Settings(BaseModel):

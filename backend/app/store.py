@@ -1,4 +1,7 @@
-import hashlib, json, os, time
+import hashlib
+import json
+import os
+import time
 from typing import Any
 from .config import settings
 
@@ -46,7 +49,13 @@ def create_or_get_job(device_id: str, idempotency_key: str, new_job_id: str) -> 
             job_id = json.load(f)["job_id"]
         return job_id, False
 
-def write_job(job_id: str, status: str, *, error: dict | None = None, artifact_path: str | None = None) -> None:
+def write_job(
+    job_id: str,
+    status: str,
+    *,
+    error: dict | None = None,
+    artifact_path: str | None = None,
+) -> None:
     _ensure_dirs()
     now = time.strftime("%Y-%m-%dT%H:%M:%S%z")
     path = job_path(job_id)

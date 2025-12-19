@@ -1,3 +1,4 @@
+import json
 import os
 from jinja2 import Environment, FileSystemLoader, select_autoescape, TemplateNotFound
 try:
@@ -6,7 +7,6 @@ except Exception:  # 環境に weasyprint 依存がない場合に備える
     HTML = None  # type: ignore
 from .config import settings
 from .models import PrintDoc
-import json
 
 _env = Environment(
     loader=FileSystemLoader("templates"),
@@ -16,7 +16,6 @@ _env = Environment(
 
 class RenderError(Exception):
     """Raised when rendering (templating/PDF) fails."""
-    pass
 
 def render_pdf(job_id: str, template_id: str, doc: PrintDoc) -> str:
     template_name = f"{template_id}.html.j2"
@@ -46,11 +45,11 @@ def render_pdf(job_id: str, template_id: str, doc: PrintDoc) -> str:
     return pdf_path
 
 
-#デバッグ用
-if name == 'main':
+# デバッグ用
+if __name__ == "__main__":
     with open("data/idem/print_doc_sample_simple.json", "r", encoding="utf-8") as f:
         data = json.load(f)
 
-    doc = PrintDoc.model_validate(data)
-    pdf_path = render_pdf("1", "index", doc)
-    print("PDF generated:", pdf_path)
+    demo_doc = PrintDoc.model_validate(data)
+    demo_pdf_path = render_pdf("1", "index", demo_doc)
+    print("PDF generated:", demo_pdf_path)

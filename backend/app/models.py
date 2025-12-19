@@ -1,5 +1,5 @@
-from pydantic import BaseModel, Field
 from typing import Literal
+from pydantic import BaseModel, Field
 
 class PrintRequest(BaseModel):
     device_id: str = Field(default="esp32")
@@ -20,8 +20,8 @@ class JobStatus(BaseModel):
         "PRINTING",
         "PRINT_FAILED",
         "PRINTED",
-                    ]
-    
+    ]
+
     error: dict | None = None
     artifact_path: str | None = None
     updated_at: str

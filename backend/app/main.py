@@ -23,9 +23,12 @@ def create_print(req: PrintRequest, bg: BackgroundTasks):
         try:
             job = read_job(job_id)
             return {"job_id": job_id, "status": job["status"]}
-        except FileNotFoundError:
+        except FileNotFoundError as exc:
             # 参照壊れはレアだが、ここでは作り直さずエラーにする
-            raise HTTPException(status_code=409, detail="Idempotency map exists but job missing")
+            raise HTTPException(
+                status_code=409,
+                detail="Idempotency map exists but job missing",
+            ) from exc
 
     write_job(job_id, "RECEIVED")
     write_job(job_id, "QUEUED")
@@ -37,8 +40,8 @@ def get_job(job_id: str):
     try:
         job = read_job(job_id)
         return JobStatus(**job)
-    except FileNotFoundError:
-        raise HTTPException(status_code=404, detail="job not found")
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="job not found") from exc
 
 def process_job(job_id: str, req: PrintRequest) -> None:
     try:
