@@ -2,13 +2,14 @@
 #define SW2 23
 #include <LiquidCrystal.h>
 LiquidCrystal lcd(32, 25, 26, 27, 14, 13);
+byte title[] = {0xB1,0xC5,0xC0,0xB6,0xDE,0xB4,0xD7,0xCC,0xDE,0xC9,0xCA};//ｱﾅﾀｶﾞｴﾗﾌﾞﾉﾊ
 
 //質問の配列
 char Q[4][50] = {
-  "boy or girl",
-  "new or old",
-  "real or fantasy",
-  "ONIGIRI or Hamburger"
+  "Boy/Girl",
+  "New/Old",
+  "Real/Fantasy",
+  "Rice/Bread"
 };
 
 //回答を保存するための文字列
@@ -30,8 +31,9 @@ void setup() {
 
   //質問の数繰り返し
   for (int i = 0; i < 4; i++) {
-    //2行目に質問の選択肢を表示
     lcd.clear();
+    lcd.write(title, 11);//1行目を表示
+    //2行目に質問の選択肢を表示
     lcd.setCursor(0, 1);
     lcd.print(Q[i]);
 
