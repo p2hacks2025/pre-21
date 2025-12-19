@@ -14,6 +14,7 @@ class Settings(BaseModel):
     data_dir: str = os.getenv("DATA_DIR", "data")
     jobs_dir: str = os.getenv("JOBS_DIR", "data/jobs")
     idem_dir: str = os.getenv("IDEM_DIR", "data/idem")
+    llm_dir: str = os.getenv("LLM_DIR", "data/llm")
     artifacts_dir: str = os.getenv("ARTIFACTS_DIR", "data/artifacts")
 
 settings = Settings()

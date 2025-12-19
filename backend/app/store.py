@@ -6,7 +6,7 @@ from typing import Any
 from .config import settings
 
 def _ensure_dirs() -> None:
-    for d in [settings.jobs_dir, settings.idem_dir, settings.artifacts_dir]:
+    for d in [settings.jobs_dir, settings.idem_dir, settings.llm_dir, settings.artifacts_dir]:
         os.makedirs(d, exist_ok=True)
 
 def _atomic_write_json(path: str, obj: dict[str, Any]) -> None:
@@ -23,6 +23,9 @@ def idem_key_to_filename(device_id: str, idempotency_key: str) -> str:
 
 def job_path(job_id: str) -> str:
     return os.path.join(settings.jobs_dir, f"{job_id}.json")
+
+def llm_path(job_id: str) -> str:
+    return os.path.join(settings.llm_dir, f"{job_id}.json")
 
 def create_or_get_job(device_id: str, idempotency_key: str, new_job_id: str) -> tuple[str, bool]:
     """
@@ -67,6 +70,11 @@ def write_job(
         "updated_at": now,
     }
     _atomic_write_json(path, obj)
+
+def write_llm_result(job_id: str, data: dict[str, Any]) -> None:
+    _ensure_dirs()
+    path = llm_path(job_id)
+    _atomic_write_json(path, data)
 
 def read_job(job_id: str) -> dict:
     path = job_path(job_id)

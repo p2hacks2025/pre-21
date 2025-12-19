@@ -2,7 +2,7 @@ import uuid
 import logging
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from .models import PrintRequest, JobStatus
-from .store import create_or_get_job, write_job, read_job
+from .store import create_or_get_job, write_job, read_job, write_llm_result
 from .gemini_client import gemini_transform, LLMError
 from .render import render_pdf
 from . import print_service
@@ -46,7 +46,8 @@ def get_job(job_id: str):
 def process_job(job_id: str, req: PrintRequest) -> None:
     try:
         write_job(job_id, "LLM_PROCESSING")
-        doc = gemini_transform(req.payload)
+        doc, llm_data = gemini_transform(req.payload)
+        write_llm_result(job_id, llm_data)
 
         write_job(job_id, "RENDERING")
         pdf_path = render_pdf(job_id, req.template_id, doc)

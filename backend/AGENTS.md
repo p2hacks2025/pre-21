@@ -34,3 +34,8 @@
 ## 設定と環境
 - ローカル開発では`.env`を`app/config.py`が自動読み込み。
 - 主要変数: `GEMINI_API_KEY`, `GEMINI_MODEL`, `BASE_URL`, `PRINTER_NAME`, `DATA_DIR`, `JOBS_DIR`, `IDEM_DIR`, `ARTIFACTS_DIR`。
+
+## gemini_transformの実装方針
+- ESP32から0か1のデータ5個送信されます。それに基づいて場合分けしてプロンプトを変える処理をしたいです
+- 最終的にそのgemini apiにデータを送信して結果をjson形式で返します
+- 整合性についてはほかファイルの仕様を優先して取ってください
