@@ -13,7 +13,7 @@ char Q[4][50] = {
 };
 
 //回答を保存するための文字列
-char ans = "";
+String ans = "0";
 
 //ボタンの状態を保存する変数
 int state1 = 1;
@@ -21,7 +21,7 @@ int state2 = 1;
 
 void setup() {
   //シリアルモニターを使用するため
-  Serial.begin(9600);
+  Serial.begin(115200);
   //ボタンの設定
   pinMode(SW1, INPUT_PULLUP);
   pinMode(SW2, INPUT_PULLUP);
@@ -31,8 +31,10 @@ void setup() {
 
   //質問の数繰り返し
   for (int i = 0; i < 4; i++) {
+    Serial.println(i);
     lcd.clear();
-    lcd.write(title, 11);//1行目を表示
+    //lcd.write(title, 11);//1行目を表示
+    lcd.print("aaa");
     //2行目に質問の選択肢を表示
     lcd.setCursor(0, 1);
     lcd.print(Q[i]);
