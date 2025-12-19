@@ -28,5 +28,5 @@ class JobStatus(BaseModel):
 
 class PrintDoc(BaseModel):
     name: str = Field(description="キラキラネーム")
-    #body: str = Field(description="本文（複数行OK）")
+    subname: str = Field(description="キラキラネームの読み仮名（ひらがな）")
     #bullets: list[str] = Field(default_factory=list, description="箇条書き（0個以上）")
