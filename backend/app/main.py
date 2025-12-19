@@ -1,10 +1,11 @@
 import uuid
+import logging
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from .models import PrintRequest, JobStatus
 from .store import create_or_get_job, write_job, read_job
-from .gemini_client import gemini_transform
+from .gemini_client import gemini_transform, LLMError
 from .render import render_pdf
-from .print_service import print_pdf
+from . import print_service
 
 app = FastAPI()
 
@@ -48,13 +49,18 @@ def process_job(job_id: str, req: PrintRequest) -> None:
         pdf_path = render_pdf(job_id, req.template_id, doc)
 
         write_job(job_id, "PRINTING", artifact_path=pdf_path)
-        print_pdf(pdf_path, req.copies)
+        print_service.print_pdf(pdf_path, req.copies)
 
         write_job(job_id, "PRINTED", artifact_path=pdf_path)
 
     except Exception as e:
-        # どこで落ちたか最低限わかるようにする
-        msg = str(e)
-        # 状態はざっくりでも良いが、デバッグのため段階別に分ける
-        status = "PRINT_FAILED" if "Print failed" in msg else "LLM_FAILED" if "GEMINI" in msg or "schema" in msg else "RENDER_FAILED"
-        write_job(job_id, status, error={"message": msg})
+        # ログにフルスタックを残してデバッグしやすくする
+        logging.exception("Job %s failed", job_id)
+        # 例外型に基づいてステータスを決定する
+        if isinstance(e, print_service.PrintError):
+            status = "PRINT_FAILED"
+        elif isinstance(e, LLMError):
+            status = "LLM_FAILED"
+        else:
+            status = "RENDER_FAILED"
+        write_job(job_id, status, error={"message": str(e)})

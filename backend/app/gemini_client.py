@@ -1,32 +1,26 @@
-from fastapi import FastAPI, HTTPException, Query
-from google import genai
-from google.genai import types
-from config import settings
+from typing import Any
+from .config import settings
+from .models import PrintDoc
+from google import genai  # google-genai パッケージを前提とする
 
-from typing import List, Optional
-from pydantic import BaseModel, Field
-import os  # 追加
-from dotenv import load_dotenv  # 追加
-
-load_dotenv() # .envファイルを読み込む
-API_KEY = os.getenv("GOOGLE_API_KEY")
-
-if not API_KEY:
-    raise RuntimeError("環境変数 GOOGLE_API_KEY が設定されていません。")
-
-
-MODEL_NAME = "gemini-3.0-flush"
-
-
-client = genai.Client(api_key=API_KEY)
-
-
-def send_text():
+class LLMError(Exception):
+    """Raised for Gemini/LLM related failures."""
     pass
 
-def generate_text():
-    pass
-    
-def return_text():
-    pass
+MODEL_NAME = settings.gemini_model
 
+def _get_client():
+    api_key = settings.gemini_api_key
+    if not api_key:
+        raise LLMError("GEMINI_API_KEY is not configured")
+    # google.genai のクライアントを返す
+    return genai.Client(api_key=api_key)
+
+def gemini_transform(payload: str) -> PrintDoc:
+    """
+    Transform input payload via Gemini into a PrintDoc.
+
+    NOTE: 未実装。実装時は google.generativeai の GenerativeModel を利用してください。
+    今はジョブの失敗を適切に扱うため、明示的に LLMError を送出します。
+    """
+    raise LLMError("gemini_transform is not implemented yet; implement using google.genai")

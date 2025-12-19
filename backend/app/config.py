@@ -1,5 +1,9 @@
 from pydantic import BaseModel
 import os
+from dotenv import load_dotenv
+
+.env を自動読み込み（ローカル開発向け）,
+load_dotenv()
 
 class Settings(BaseModel):
     gemini_api_key: str | None = os.getenv("GEMINI_API_KEY")
