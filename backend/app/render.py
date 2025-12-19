@@ -25,9 +25,9 @@ def render_pdf(job_id: str, template_id: str, doc: PrintDoc) -> str:
         raise RenderError(f"template not found: {template_name}") from e
 
     html_str = template.render(
-        title=doc.title,
-        body=doc.body,
-        bullets=doc.bullets,
+        name=doc.name,
+        #body=doc.body,
+        #bullets=doc.bullets,
     )
 
     os.makedirs(settings.artifacts_dir, exist_ok=True)

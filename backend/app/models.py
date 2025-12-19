@@ -27,6 +27,6 @@ class JobStatus(BaseModel):
     updated_at: str
 
 class PrintDoc(BaseModel):
-    title: str = Field(description="印刷タイトル")
-    body: str = Field(description="本文（複数行OK）")
-    bullets: list[str] = Field(default_factory=list, description="箇条書き（0個以上）")
+    name: str = Field(description="キラキラネーム")
+    #body: str = Field(description="本文（複数行OK）")
+    #bullets: list[str] = Field(default_factory=list, description="箇条書き（0個以上）")

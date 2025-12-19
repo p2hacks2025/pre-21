@@ -43,7 +43,7 @@ def _topic_index(bits: Iterable[int]) -> int:
 
 def _build_prompt(bits: list[int]) -> str:
     tone = "男" if bits[0] else "女"
-    length = "和" if bits[1] else "洋"
+    length = "和" if bits[1] else "現代"
     topics = [
         "ファンタジー",
         "外国語由来の言葉",
@@ -53,11 +53,11 @@ def _build_prompt(bits: list[int]) -> str:
     topic = topics[_topic_index(bits)]
     include_bullets = bool(bits[4])
 
-    bullets_rule = "キラキラネームを生成する" if include_bullets else "箇条書きは空配列にする"
+    bullets_rule = "漢字表記のキラキラネームを生成する" if include_bullets else "箇条書きは空配列にする"
     return (
         "あなたは赤子に名前をつける親です。次の条件でJSONのみを出力してください。\n"
         "出力フォーマットは {\"name\": string} です。\n"
-        "コードフェンスや説明文は不要です。\n"
+        "nameは漢字表記です。コードフェンスや説明文は不要です。\n"
         f"トーン: {tone}\n"
         f"長さ: {length}\n"
         f"テーマ: {topic}\n"

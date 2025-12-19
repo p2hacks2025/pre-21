@@ -10,6 +10,15 @@
 </head>
 <body>
   <h1>{{ name }}</h1>
+  <pre>{{ name }}</pre>
 
+  {% if bullets and bullets|length > 0 %}
+    <h2>要点</h2>
+    <ul>
+      {% for b in bullets %}
+        <li>{{ b }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
 </body>
 </html>
