@@ -56,8 +56,10 @@ def _build_prompt(bits: list[int]) -> str:
     bullets_rule = "漢字表記のキラキラネームを生成する" if include_bullets else "箇条書きは空配列にする"
     return (
         "あなたは赤子に名前をつける親です。次の条件でJSONのみを出力してください。\n"
-        "出力フォーマットは {\"name\": string} です。\n"
-        "nameは漢字表記です。コードフェンスや説明文は不要です。\n"
+        "出力フォーマットは {\"name\": string, \"subname\": string} です。\n"
+        "nameは漢字表記です。\n"
+        "subnameはnameの読み仮名（ひらがな）です。\n"
+        "コードフェンスや説明文は不要です。\n"
         f"トーン: {tone}\n"
         f"長さ: {length}\n"
         f"テーマ: {topic}\n"
