@@ -2,7 +2,7 @@
 #define SW2 23
 #include <LiquidCrystal.h>
 LiquidCrystal lcd(32, 25, 26, 27, 14, 13);
-byte title[] = {0xB1,0xC5,0xC0,0xB6,0xDE,0xB4,0xD7,0xCC,0xDE,0xC9,0xCA};//ｱﾅﾀｶﾞｴﾗﾌﾞﾉﾊ
+byte title[] = { 0xB1, 0xC5, 0xC0, 0xB6, 0xDE, 0xB4, 0xD7, 0xCC, 0xDE, 0xC9, 0xCA };  //ｱﾅﾀｶﾞｴﾗﾌﾞﾉﾊ
 
 //質問の配列
 char Q[4][50] = {
@@ -13,7 +13,7 @@ char Q[4][50] = {
 };
 
 //回答を保存するための文字列
-String ans = "0";
+String ans = "";
 
 //ボタンの状態を保存する変数
 int state1 = 1;
@@ -44,7 +44,7 @@ void setup() {
     state2 = digitalRead(SW2);
 
     //ボタンがどちらか押されるまで先に進まない
-    while (!state1 && !state2) {
+    while (state1 && state2) {
       //ボタンの状態更新
       state1 = digitalRead(SW1);
       state2 = digitalRead(SW2);
@@ -56,6 +56,14 @@ void setup() {
     } else {
       ans += "1";
     }
+
+    //ボタンがどちらか離されるまで先に進まない
+    while (!state1 || !state2) {
+      //ボタンの状態更新
+      state1 = digitalRead(SW1);
+      state2 = digitalRead(SW2);
+    }
+
     //確認用にシリアルモニターに出力
     Serial.println(ans);
   }
