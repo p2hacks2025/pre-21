@@ -61,4 +61,4 @@
 - Canva
 - Arduino IDE
 - VSCode
-- codex
+- Codex
