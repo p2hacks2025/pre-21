@@ -72,7 +72,9 @@ void setup() {
     Serial.println(ans);
   }
   lcd.clear();
-  lcd.print("finish");
+  lcd.print("Send");
+  lcd.setCursor(0, 1);
+  lcd.print("Thank you");
 
   //サーバーにデータ送信
   senddata();
