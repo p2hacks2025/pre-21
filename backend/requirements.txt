@@ -1,0 +1,12 @@
+dotenv
+fastapi[all]
+google.generativeai
+jinja2
+pydantic
+pylint
+pypdf
+pytest
+python-dotenv
+python-multipart
+uvicorn[all]
+weasyprint

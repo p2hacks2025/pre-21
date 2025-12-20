@@ -1,0 +1,93 @@
+import uuid
+import logging
+import os
+from fastapi import FastAPI, BackgroundTasks, HTTPException
+from fastapi.responses import FileResponse
+from .models import PrintRequest, JobStatus
+from .store import create_or_get_job, write_job, read_job, write_llm_result
+from .gemini_client import gemini_transform, LLMError
+from .render import render_pdf
+from . import print_service
+from .config import settings
+
+app = FastAPI()
+
+@app.get("/health")
+def health():
+    return {"ok": True}
+
+@app.post("/v1/print", response_model=dict)
+def create_print(req: PrintRequest, bg: BackgroundTasks):
+    new_job_id = str(uuid.uuid4())
+    job_id, created = create_or_get_job(req.device_id, req.idempotency_key, new_job_id)
+
+    if not created:
+        # 既存ジョブを返す（再送でも二重印刷しない）
+        try:
+            job = read_job(job_id)
+            return {"job_id": job_id, "status": job["status"]}
+        except FileNotFoundError as exc:
+            # 参照壊れはレアだが、ここでは作り直さずエラーにする
+            raise HTTPException(
+                status_code=409,
+                detail="Idempotency map exists but job missing",
+            ) from exc
+
+    write_job(job_id, "RECEIVED")
+    write_job(job_id, "QUEUED")
+    bg.add_task(process_job, job_id, req)
+    return {"job_id": job_id, "status": "QUEUED"}
+
+@app.get("/v1/jobs/{job_id}", response_model=JobStatus)
+def get_job(job_id: str):
+    try:
+        job = read_job(job_id)
+        return JobStatus(**job)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="job not found") from exc
+
+@app.get("/v1/download/{job_id}")
+def download_pdf(job_id: str):
+    try:
+        job = read_job(job_id)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="job not found") from exc
+
+    artifact_path = job.get("artifact_path")
+    if not artifact_path:
+        artifact_path = os.path.join(settings.artifacts_dir, f"{job_id}.pdf")
+
+    if not os.path.exists(artifact_path):
+        raise HTTPException(status_code=404, detail="pdf not found")
+
+    return FileResponse(
+        artifact_path,
+        media_type="application/pdf",
+        filename=f"{job_id}.pdf",
+    )
+
+def process_job(job_id: str, req: PrintRequest) -> None:
+    try:
+        write_job(job_id, "LLM_PROCESSING")
+        doc, llm_data = gemini_transform(req.payload)
+        write_llm_result(job_id, llm_data)
+
+        write_job(job_id, "RENDERING")
+        pdf_path = render_pdf(job_id, req.template_id, doc)
+
+        write_job(job_id, "PRINTING", artifact_path=pdf_path)
+        print_service.print_pdf(pdf_path, req.copies)
+
+        write_job(job_id, "PRINTED", artifact_path=pdf_path)
+
+    except Exception as e:
+        # ログにフルスタックを残してデバッグしやすくする
+        logging.exception("Job %s failed", job_id)
+        # 例外型に基づいてステータスを決定する
+        if isinstance(e, print_service.PrintError):
+            status = "PRINT_FAILED"
+        elif isinstance(e, LLMError):
+            status = "LLM_FAILED"
+        else:
+            status = "RENDER_FAILED"
+        write_job(job_id, status, error={"message": str(e)})
