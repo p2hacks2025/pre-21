@@ -52,7 +52,7 @@
 ### 利用したプログラミング言語
 
 - Python
-  -Arduino 言語(ESP32)
+- Arduino 言語(ESP32)
 
 ### 利用したフレームワーク・ライブラリ
 
@@ -63,8 +63,8 @@
 
 ### その他開発に使用したツール・サービス
 
-- github
 - Canva
 - Arduino IDE
 - VSCode
 - Codex
+- ESP32
