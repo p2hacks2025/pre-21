@@ -4,7 +4,7 @@
 //discordに送ったやつコピペ（wifi関連）
 
 
-void wifi(){
+void wifi() {
   /* --- Wi-Fi 接続 --- */
   lcd.begin(16, 2);
   lcd.clear();
@@ -23,18 +23,33 @@ void wifi(){
   Serial.println(WiFi.localIP());
 }
 
-void senddata(){
-   /* --- サーバー へ送信 --- */
+void senddata() {
+  /* --- サーバー へ送信 --- */
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
 
     http.begin(serverUrl);
-    http.addHeader("Content-Type", "text/plain");
+    http.addHeader("accept", "application/json");
+    http.addHeader("Content-Type", "application/json");
 
-    int responseCode = http.POST(ans);
+    // curl の -d と同じJSON
+    String body = R"JSON(
+      {
+      "device_id": "esp32",
+      "idempotency_key": "stringst",
+      "payload": "00000",
+      "template_id": "default",
+      "copies": 1
+      }
+      )JSON";
+
+    int code = http.POST(body);
 
     Serial.print("HTTP Response code: ");
-    Serial.println(responseCode);
+    Serial.println(code);
+
+    String resp = http.getString();
+    Serial.println(resp);
 
     http.end();
   } else {
