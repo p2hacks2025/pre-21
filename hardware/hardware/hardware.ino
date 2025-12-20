@@ -22,6 +22,10 @@ int state2 = 1;
 void setup() {
   //シリアルモニターを使用するため
   Serial.begin(115200);
+
+  //wifi接続
+  wifi();
+
   //ボタンの設定
   pinMode(SW1, INPUT_PULLUP);
   pinMode(SW2, INPUT_PULLUP);
@@ -33,8 +37,8 @@ void setup() {
   for (int i = 0; i < 4; i++) {
     Serial.println(i);
     lcd.clear();
-    //lcd.write(title, 11);//1行目を表示
-    lcd.print("aaa");
+    lcd.write(title, 11);//1行目を表示
+    //lcd.print("aaa");
     //2行目に質問の選択肢を表示
     lcd.setCursor(0, 1);
     lcd.print(Q[i]);
@@ -67,6 +71,11 @@ void setup() {
     //確認用にシリアルモニターに出力
     Serial.println(ans);
   }
+  lcd.clear();
+  lcd.print("finish");
+
+  //サーバーにデータ送信
+  senddata();
 }
 
 void loop() {
