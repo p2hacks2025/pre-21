@@ -52,6 +52,8 @@
 
 - Gemini API
 - weasyprint
+- FastAPI
+- GTK+ for Windows Runtime Environment
 
 ### その他開発に使用したツール・サービス
 
@@ -60,4 +62,3 @@
 - Arduino IDE
 - VSCode
 - codex
-- FastAPI
