@@ -26,8 +26,8 @@ def render_pdf(job_id: str, template_id: str, doc: PrintDoc) -> str:
 
     html_str = template.render(
         name=doc.name,
-        #body=doc.body,
-        #bullets=doc.bullets,
+        ruby = doc.ruby,
+        
     )
 
     os.makedirs(settings.artifacts_dir, exist_ok=True)

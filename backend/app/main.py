@@ -1,11 +1,14 @@
 import uuid
 import logging
+import os
 from fastapi import FastAPI, BackgroundTasks, HTTPException
+from fastapi.responses import FileResponse
 from .models import PrintRequest, JobStatus
 from .store import create_or_get_job, write_job, read_job, write_llm_result
 from .gemini_client import gemini_transform, LLMError
 from .render import render_pdf
 from . import print_service
+from .config import settings
 
 app = FastAPI()
 
@@ -42,6 +45,26 @@ def get_job(job_id: str):
         return JobStatus(**job)
     except FileNotFoundError as exc:
         raise HTTPException(status_code=404, detail="job not found") from exc
+
+@app.get("/v1/download/{job_id}")
+def download_pdf(job_id: str):
+    try:
+        job = read_job(job_id)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="job not found") from exc
+
+    artifact_path = job.get("artifact_path")
+    if not artifact_path:
+        artifact_path = os.path.join(settings.artifacts_dir, f"{job_id}.pdf")
+
+    if not os.path.exists(artifact_path):
+        raise HTTPException(status_code=404, detail="pdf not found")
+
+    return FileResponse(
+        artifact_path,
+        media_type="application/pdf",
+        filename=f"{job_id}.pdf",
+    )
 
 def process_job(job_id: str, req: PrintRequest) -> None:
     try:

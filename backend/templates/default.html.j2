@@ -1,141 +1,148 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <title>命名書</title>
-    <style>
-        /* =========================================
-           設定変数 (CSS Custom Properties)
-           チーム開発で変更頻度が高い値をここで一元管理します
-           ========================================= */
-        :root {
-            /* 用紙設定: A4サイズ */
-            --paper-width: 210mm;
-            --paper-height: 297mm;
-            
-            /* 色設定 */
-            --color-bg-app: #555;
-            --color-paper: #ffffff;
-            --color-debug-border: #ccc;
+  <meta charset="UTF-8" />
+  <title>{{ title | default("命名書") }}</title>
 
-            /* フォントサイズ */
-            --fs-base: 24pt;
-            --fs-date: 50px;
-            --fs-label: 100px;
-            --fs-name: 180pt;
-            --fs-ruby: 70px;
-        }
+  <style>
+    @page { size: A4; margin: 0; }
 
-        /* =========================================
-           ベーススタイル
-           ========================================= */
-        body {
-            margin: 0;
-            padding: 20px;
-            background-color: var(--color-bg-app);
-        }
+    html, body { height: 100%; }
 
-        /* 開発用デバッグスタイル 
-           ※ 要素の領域を可視化するための点線枠
-        */
-        .debug-box {
-            border: 1px dashed var(--color-debug-border);
-            padding: 10px;
-            margin-left: 20px; /* 元のコードの仕様維持：絶対配置要素に対するオフセット */
-        }
+    @font-face {
+      font-family: "Tamanegi";
+      src: url("static/fonts/tamanegi.ttf") format("truetype");
+      font-weight: normal;
+      font-style: normal;
+    }
 
-        /* =========================================
-           コンポーネント: 命名書 (Naming Sheet)
-           ========================================= */
-        
-        /* 用紙のコンテナ */
-        .naming-sheet {
-            /* レイアウト: A4中央配置 */
-            position: relative;
-            width: var(--paper-width);
-            height: var(--paper-height);
-            margin: 0 auto;
-            
-            /* 装飾 */
-            background-color: var(--color-paper);
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    :root{
+        --paper-w: 210mm;
+        --paper-h: 297mm;
 
-            /* 文字設定: 縦書き */
-            writing-mode: vertical-rl;
-            text-orientation: upright;
-            font-family: serif;
-        }
+        /* 文字が巨大になるので、余白も少し増やす（18→22mm） */
+        --margin-top: 22mm;
+        --margin-right: 22mm;
+        --margin-bottom: 22mm;
+        --margin-left: 22mm;
 
-        /* 要素共通スタイル (Element)
-           用紙内の各テキスト要素に適用
-        */
-        .naming-sheet__item {
-            position: absolute;
-            font-size: var(--fs-base);
-            white-space: nowrap;
-        }
+        --paper-bg: #fff;
+        --ink: #111;
+        --sub-ink: #333;
 
-        /* =========================================
-           各要素の配置 (Modifiers)
-           ========================================= */
+        /* フォントサイズを2倍 */
+        --fs-name: 52mm;  /* 26mm → 52mm */
+        --fs-ruby: 16mm;  /*  8mm → 16mm */
+        --fs-date: 14mm;  /*  7mm → 14mm */
+        --fs-seal: 14mm;  /*  7mm → 14mm */
 
-        /* 1. 日付 */
-        .naming-sheet__item--date {
-            left: 5%;
-            top: 5%;
-            font-size: var(--fs-date);
-        }
+        /* 行間はそのまま（変えると“間延び”しやすい） */
+        --lh-tight: 1.1;
+        --lh-normal: 1.35;
+    }
 
-        /* 2. 「命名」ラベル */
-        .naming-sheet__item--label {
-            /* 横方向：親の50%位置を基準に、自身の50%分戻して中央揃え */
-            left: 50%;
-            transform: translateX(-50%);
-            
-            top: 5%;
-            font-size: var(--fs-label);
-        }
+    body{
+      margin: 0;
+      padding: 0;
+      background: #555;
+      color: var(--ink);
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
 
-        /* 3. 名前（漢字） */
-        .naming-sheet__item--name {
-            left: 50%;
-            transform: translateX(-50%);
-            
-            /* 注意: vhはビューポートの高さ依存です。印刷時は挙動が変わる可能性があります */
-            top: 20vh;
-            font-size: var(--fs-name);
-        }
+    .page{
+      width: var(--paper-w);
+      height: var(--paper-h);
+      background: var(--paper-bg);
+      margin: 0 auto;
+      padding: var(--margin-top) var(--margin-right) var(--margin-bottom) var(--margin-left);
+      font-family: "Tamanegi", "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", serif;
+      box-sizing: border-box;
+    }
 
-        /* 4. 名前（ルビ） */
-        .naming-sheet__item--ruby {
-            right: 10%;
-            top: 23vh;
-            font-size: var(--fs-ruby);
-        }
+    /* ここが肝：3段レイアウトで中央段をガチ中央に固定 */
+    .frame{
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+    }
 
-    </style>
+    .top-spacer{
+      flex: 1;
+    }
+
+    .center{
+      flex: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;   /* 横中央 */
+      justify-content: center;
+      text-align: center;
+      gap: 4mm;
+    }
+
+    .bottom{
+      flex: 1;
+      display: flex;
+      align-items: flex-end;          /* 下寄せ */
+    }
+
+    .meta{
+      width: 100%;
+      display: flex;
+      justify-content: space-between; /* 左右に分ける */
+      align-items: flex-end;
+      font-size: var(--fs-date);
+      color: var(--sub-ink);
+    }
+
+    .name{
+      font-size: var(--fs-name);
+      letter-spacing: 0.04em;
+      line-height: var(--lh-tight);
+      max-width: calc(var(--paper-w) - var(--margin-left) - var(--margin-right));
+      overflow-wrap: anywhere;
+      word-break: keep-all;
+    }
+
+    .ruby{
+      font-size: var(--fs-ruby);
+      letter-spacing: 0.06em;
+      line-height: var(--lh-normal);
+      color: var(--sub-ink);
+    }
+
+    .date{ white-space: nowrap; text-align: left; }
+    .seal{ white-space: nowrap; text-align: right; }
+
+    *{ box-sizing: border-box; }
+  </style>
 </head>
+
 <body>
+  <div class="page">
+    <div class="frame">
 
-    <div class="naming-sheet debug-box">
-        
-        <div class="naming-sheet__item naming-sheet__item--date debug-box">
-            令和七年十二月二十日
-        </div>
+      <div class="top-spacer"></div>
 
-        <div class="naming-sheet__item naming-sheet__item--label debug-box">
-            命名
-        </div>
+      <div class="center">
+        {% if ruby %}
+          <div class="ruby">{{ ruby }}</div>
+        {% endif %}
+        <div class="name">{{ name | default("名前") }}</div>
+      </div>
 
-        <div class="naming-sheet__item naming-sheet__item--name debug-box">
-            {{ name }}
+      <div class="bottom">
+        <div class="meta">
+          <div class="date">{{ date | default("令和7年") }}</div>
+          <div class="seal">{{ issuer | default("") }}</div>
         </div>
-
-        <div class="naming-sheet__item naming-sheet__item--ruby debug-box">
-            {{ ruby }}
-        </div>
+      </div>
 
     </div>
-
+  </div>
 </body>
 </html>

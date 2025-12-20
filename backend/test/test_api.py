@@ -59,3 +59,22 @@ def test_print_flow_and_idempotency(tmp_path, monkeypatch):
     assert data2["job_id"] == job_id
     assert data2["status"] == "PRINTED"
 
+
+def test_download_pdf(tmp_path, monkeypatch):
+    monkeypatch.setattr(settings, "jobs_dir", str(tmp_path / "jobs"), raising=False)
+    monkeypatch.setattr(settings, "idem_dir", str(tmp_path / "idem"), raising=False)
+    monkeypatch.setattr(settings, "artifacts_dir", str(tmp_path / "artifacts"), raising=False)
+
+    job_id = "job-123"
+    pdf_path = tmp_path / "artifacts" / f"{job_id}.pdf"
+    pdf_path.parent.mkdir(parents=True, exist_ok=True)
+    pdf_bytes = b"%PDF-1.4\n%fake\n"
+    pdf_path.write_bytes(pdf_bytes)
+
+    write_job(job_id, "PRINTED", artifact_path=str(pdf_path))
+
+    client = TestClient(app)
+    r = client.get(f"/v1/download/{job_id}")
+    assert r.status_code == 200
+    assert r.headers["content-type"].startswith("application/pdf")
+    assert r.content == pdf_bytes
