@@ -1,25 +1,141 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8">
-  <style>
-    body { font-family: "Noto Sans CJK JP", "Noto Sans JP", sans-serif; font-size: 12pt; }
-    h1 { font-size: 18pt; margin-bottom: 8mm; }
-    pre { white-space: pre-wrap; }
-  </style>
+    <meta charset="UTF-8">
+    <title>命名書</title>
+    <style>
+        /* =========================================
+           設定変数 (CSS Custom Properties)
+           チーム開発で変更頻度が高い値をここで一元管理します
+           ========================================= */
+        :root {
+            /* 用紙設定: A4サイズ */
+            --paper-width: 210mm;
+            --paper-height: 297mm;
+            
+            /* 色設定 */
+            --color-bg-app: #555;
+            --color-paper: #ffffff;
+            --color-debug-border: #ccc;
+
+            /* フォントサイズ */
+            --fs-base: 24pt;
+            --fs-date: 50px;
+            --fs-label: 100px;
+            --fs-name: 180pt;
+            --fs-ruby: 70px;
+        }
+
+        /* =========================================
+           ベーススタイル
+           ========================================= */
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: var(--color-bg-app);
+        }
+
+        /* 開発用デバッグスタイル 
+           ※ 要素の領域を可視化するための点線枠
+        */
+        .debug-box {
+            border: 1px dashed var(--color-debug-border);
+            padding: 10px;
+            margin-left: 20px; /* 元のコードの仕様維持：絶対配置要素に対するオフセット */
+        }
+
+        /* =========================================
+           コンポーネント: 命名書 (Naming Sheet)
+           ========================================= */
+        
+        /* 用紙のコンテナ */
+        .naming-sheet {
+            /* レイアウト: A4中央配置 */
+            position: relative;
+            width: var(--paper-width);
+            height: var(--paper-height);
+            margin: 0 auto;
+            
+            /* 装飾 */
+            background-color: var(--color-paper);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+
+            /* 文字設定: 縦書き */
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            font-family: serif;
+        }
+
+        /* 要素共通スタイル (Element)
+           用紙内の各テキスト要素に適用
+        */
+        .naming-sheet__item {
+            position: absolute;
+            font-size: var(--fs-base);
+            white-space: nowrap;
+        }
+
+        /* =========================================
+           各要素の配置 (Modifiers)
+           ========================================= */
+
+        /* 1. 日付 */
+        .naming-sheet__item--date {
+            left: 5%;
+            top: 5%;
+            font-size: var(--fs-date);
+        }
+
+        /* 2. 「命名」ラベル */
+        .naming-sheet__item--label {
+            /* 横方向：親の50%位置を基準に、自身の50%分戻して中央揃え */
+            left: 50%;
+            transform: translateX(-50%);
+            
+            top: 5%;
+            font-size: var(--fs-label);
+        }
+
+        /* 3. 名前（漢字） */
+        .naming-sheet__item--name {
+            left: 50%;
+            transform: translateX(-50%);
+            
+            /* 注意: vhはビューポートの高さ依存です。印刷時は挙動が変わる可能性があります */
+            top: 20vh;
+            font-size: var(--fs-name);
+        }
+
+        /* 4. 名前（ルビ） */
+        .naming-sheet__item--ruby {
+            right: 10%;
+            top: 23vh;
+            font-size: var(--fs-ruby);
+        }
+
+    </style>
 </head>
 <body>
-  <h2>{{ subname }}</h2>
-  <h1>{{ name }}</h1>
-  <pre>{{ name }}</pre>
 
-  {% if bullets and bullets|length > 0 %}
-    <h2>要点</h2>
-    <ul>
-      {% for b in bullets %}
-        <li>{{ b }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
+    <div class="naming-sheet debug-box">
+        
+        <div class="naming-sheet__item naming-sheet__item--date debug-box">
+            令和七年十二月二十日
+        </div>
+
+        <div class="naming-sheet__item naming-sheet__item--label debug-box">
+            命名
+        </div>
+
+        <div class="naming-sheet__item naming-sheet__item--name debug-box">
+            {{ name }}
+        </div>
+
+        <div class="naming-sheet__item naming-sheet__item--ruby debug-box">
+            {{ ruby }}
+        </div>
+
+    </div>
+
 </body>
 </html>
